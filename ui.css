@@ -1,0 +1,1039 @@
+
+/* ==========================================
+   FIND THE NEEDLE
+   CARTOON / TYCOON INTERFACE
+========================================== */
+
+:root {
+    --black: #171717;
+    --white: #ffffff;
+    --green: #1eff74;
+    --green-dark: #087c38;
+    --orange: #ffad36;
+    --blue: #38aaff;
+    --yellow: #ffd72e;
+
+    --outline: 4px solid var(--black);
+    --cartoon-shadow: 0 5px 0 var(--black);
+}
+
+/* ==========================================
+   RESET
+========================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    font-family: "Arial Black", Impact, Arial, sans-serif;
+
+    background: #6ba94c;
+    color: white;
+
+    user-select: none;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* ==========================================
+   SPIELWELT
+========================================== */
+
+#game-container {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}
+
+#game-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ==========================================
+   GELDANZEIGE
+========================================== */
+
+#money-display {
+    position: fixed;
+    z-index: 20;
+
+    top: 25px;
+    left: 25px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 12px 19px 12px 13px;
+
+    background: #252525;
+    border: 4px solid var(--black);
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 0 var(--black),
+        0 9px 0 rgba(0, 0, 0, 0.2);
+
+    transform: rotate(-2deg);
+}
+
+/* Geldschein-Stapel */
+
+.money-bill-icon {
+    position: relative;
+
+    width: 65px;
+    height: 48px;
+
+    perspective: 150px;
+    transform: rotate(-8deg);
+}
+
+.money-bill {
+    position: absolute;
+
+    width: 49px;
+    height: 30px;
+
+    left: 7px;
+    top: 8px;
+
+    border: 3px solid #07582c;
+    border-radius: 5px;
+
+    background: linear-gradient(
+        135deg,
+        #a6ff9b,
+        #35c86c
+    );
+
+    box-shadow:
+        2px 3px 0 #07582c,
+        4px 6px 0 #0c7738,
+        6px 9px 0 #07582c;
+
+    transform: rotateX(12deg) rotateY(-12deg);
+}
+
+.money-bill::before {
+    content: "";
+    position: absolute;
+
+    top: 2px;
+    left: 3px;
+    right: 3px;
+
+    height: 4px;
+
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 5px;
+}
+
+.money-bill::after {
+    content: "$";
+
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #07582c;
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.money-bill:nth-child(2) {
+    transform: translate(-3px, -3px) rotateX(12deg) rotateY(-12deg);
+}
+
+.money-bill:nth-child(3) {
+    transform: translate(-6px, -6px) rotateX(12deg) rotateY(-12deg);
+}
+
+/* Goldene Banderole */
+
+.money-band {
+    position: absolute;
+    z-index: 5;
+
+    width: 12px;
+    height: 35px;
+
+    top: 4px;
+    left: 25px;
+
+    background: linear-gradient(
+        90deg,
+        #b77a08,
+        #ffe57a,
+        #d99a16
+    );
+
+    border: 2px solid #6e4800;
+    border-radius: 2px;
+
+    transform: rotate(-8deg);
+}
+
+.money-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.money-caption {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #dedede;
+}
+
+#money {
+    color: var(--green);
+
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 27px;
+    font-weight: 900;
+
+    -webkit-text-stroke: 1px var(--black);
+
+    text-shadow:
+        -3px -3px 0 var(--black),
+         3px -3px 0 var(--black),
+        -3px  3px 0 var(--black),
+         3px  3px 0 var(--black),
+        -3px  0   0 var(--black),
+         3px  0   0 var(--black),
+         0   -3px 0 var(--black),
+         0    3px 0 var(--black);
+
+    white-space: nowrap;
+}
+
+/* ==========================================
+   SAMMELBEUTEL
+========================================== */
+
+#bag-display {
+    position: fixed;
+    z-index: 20;
+
+    top: 115px;
+    left: 30px;
+
+    width: 125px;
+    height: 145px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform-origin: top center;
+}
+
+/* Sackkörper */
+
+.bag-body {
+    position: absolute;
+
+    bottom: 5px;
+
+    width: 94px;
+    height: 112px;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        90deg,
+        #a8793e,
+        #e3bb75 48%,
+        #ad7b40
+    );
+
+    border: 5px solid var(--black);
+
+    border-radius:
+        17px 17px 35px 35px;
+
+    clip-path: polygon(
+        15% 0,
+        85% 0,
+        100% 100%,
+        0 100%
+    );
+
+    box-shadow:
+        inset 8px 0 rgba(255, 255, 255, 0.17),
+        inset -8px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Sacköffnung */
+
+.bag-mouth {
+    position: absolute;
+    z-index: 4;
+
+    top: 18px;
+    left: 19px;
+
+    width: 88px;
+    height: 27px;
+
+    border: 5px solid var(--black);
+    border-radius: 50%;
+
+    background: #69441f;
+}
+
+/* Heu im Beutel */
+
+.bag-hay {
+    position: absolute;
+    z-index: 2;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: var(--bag-fill, 0%);
+
+    background:
+        repeating-linear-gradient(
+            75deg,
+            transparent 0 5px,
+            rgba(255, 235, 110, 0.9) 6px 9px,
+            transparent 10px 13px
+        ),
+        linear-gradient(
+            0deg,
+            #c98a16,
+            #ffe36a
+        );
+
+    transition: height 0.3s ease;
+}
+
+/* Anzahl im Sack */
+
+.bag-count {
+    position: absolute;
+    z-index: 8;
+
+    bottom: 25px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 27px;
+    color: white;
+
+    -webkit-text-stroke: 2px var(--black);
+
+    text-shadow:
+        3px 3px 0 var(--black),
+        -2px -2px 0 var(--black);
+
+    pointer-events: none;
+}
+
+.bag-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    color: white;
+
+    -webkit-text-stroke: 0.5px var(--black);
+
+    text-shadow:
+        2px 2px 0 var(--black),
+        -1px -1px 0 var(--black);
+}
+
+/* Sack wackelt beim Sammeln */
+
+#bag-display.collecting {
+    animation: bag-shake 0.38s ease;
+}
+
+@keyframes bag-shake {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-9deg); }
+    40%  { transform: rotate(8deg); }
+    60%  { transform: rotate(-6deg); }
+    80%  { transform: rotate(4deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* ==========================================
+   INVENTARLEISTE
+========================================== */
+
+#hotbar {
+    position: fixed;
+    z-index: 25;
+
+    left: 50%;
+    bottom: 27px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    gap: 9px;
+
+    padding: 9px;
+
+    background: rgba(30, 30, 30, 0.88);
+
+    border: 4px solid var(--black);
+    border-radius: 13px;
+
+    box-shadow: 0 5px 0 var(--black);
+}
+
+.hotbar-slot {
+    position: relative;
+
+    width: 78px;
+    height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #777777;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.12) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(0, 0, 0, 0.12) 75%
+        ),
+        linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.12) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(0, 0, 0, 0.12) 75%
+        );
+
+    background-size: 16px 16px;
+    background-position: 0 0, 8px 8px;
+
+    border: 4px solid var(--black);
+    border-radius: 7px;
+
+    outline: 3px solid #555;
+    outline-offset: -8px;
+}
+
+.hotbar-slot.selected {
+    outline: 4px solid var(--blue);
+    outline-offset: -5px;
+
+    box-shadow:
+        0 0 0 2px var(--black),
+        0 0 13px rgba(56, 170, 255, 0.8);
+}
+
+.slot-label {
+    position: absolute;
+
+    bottom: 4px;
+    left: 0;
+    right: 0;
+
+    text-align: center;
+
+    font-size: 10px;
+    color: white;
+
+    -webkit-text-stroke: 1px var(--black);
+
+    text-shadow:
+        2px 2px 0 var(--black),
+        -1px -1px 0 var(--black);
+
+    z-index: 10;
+}
+
+/* ==========================================
+   HAND-ICON
+========================================== */
+
+.hand-icon {
+    position: relative;
+
+    width: 53px;
+    height: 51px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform-origin: bottom center;
+}
+
+.hand-icon svg {
+    position: absolute;
+
+    width: 48px;
+    height: 48px;
+
+    overflow: visible;
+}
+
+.hand-icon .hand-back {
+    fill: #087c38;
+    stroke: var(--black);
+    stroke-width: 4;
+    stroke-linejoin: round;
+
+    animation: hand-back-move 4s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+.hand-icon .hand-front {
+    fill: #65ef37;
+    stroke: var(--black);
+    stroke-width: 4;
+    stroke-linejoin: round;
+
+    animation: hand-front-move 3.5s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+@keyframes hand-back-move {
+    0%, 100% {
+        transform: rotate(-5deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(5deg) translateY(-3px);
+    }
+}
+
+@keyframes hand-front-move {
+    0%, 100% {
+        transform: rotate(5deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(-7deg) translateY(-4px);
+    }
+}
+
+/* ==========================================
+   GREIFEN-ANZEIGE
+========================================== */
+
+#grab-prompt {
+    position: fixed;
+    z-index: 30;
+
+    left: 50%;
+    bottom: 125px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 9px 17px;
+
+    background: #383838;
+
+    border: 4px solid var(--black);
+    border-radius: 12px;
+
+    box-shadow: 0 4px 0 var(--black);
+
+    color: white;
+}
+
+.mouse-icon {
+    position: relative;
+
+    width: 20px;
+    height: 29px;
+
+    border: 3px solid var(--black);
+    border-radius: 10px;
+
+    background: #dedede;
+}
+
+.mouse-icon::before {
+    content: "";
+
+    position: absolute;
+    top: -2px;
+    left: 5px;
+
+    width: 6px;
+    height: 12px;
+
+    background: #ff963d;
+    border: 2px solid var(--black);
+    border-radius: 5px;
+}
+
+.grab-text {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    text-shadow:
+        2px 2px 0 var(--black),
+        -1px -1px 0 var(--black);
+}
+
+/* ==========================================
+   FADENKREUZ
+========================================== */
+
+#crosshair-container {
+    position: fixed;
+    z-index: 30;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+#crosshair {
+    width: 32px;
+    height: 32px;
+
+    object-fit: contain;
+    display: block;
+}
+
+/* ==========================================
+   INTERAKTION
+========================================== */
+
+#interaction-ui {
+    position: fixed;
+    z-index: 35;
+
+    top: calc(50% + 35px);
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    padding: 9px 15px;
+
+    background: #303030;
+
+    border: 3px solid var(--black);
+    border-radius: 9px;
+
+    box-shadow: 0 3px 0 var(--black);
+
+    pointer-events: none;
+}
+
+#interaction-title {
+    font-size: 13px;
+    color: var(--yellow);
+}
+
+#interaction-description {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    color: white;
+}
+
+/* ==========================================
+   VERKAUF
+========================================== */
+
+#sell-hint {
+    position: fixed;
+    z-index: 35;
+
+    left: 50%;
+    bottom: 130px;
+
+    transform: translateX(-50%);
+
+    display: none;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 15px;
+
+    background: #303030;
+
+    border: 3px solid var(--black);
+    border-radius: 10px;
+
+    box-shadow: 0 4px 0 var(--black);
+
+    font-size: 12px;
+}
+
+/* ==========================================
+   ZEITANZEIGE
+========================================== */
+
+#play-time {
+    position: fixed;
+    z-index: 25;
+
+    right: 22px;
+    bottom: 22px;
+
+    padding: 10px 16px;
+
+    background: #292929;
+
+    border: 4px solid var(--black);
+    border-radius: 11px;
+
+    box-shadow: 0 4px 0 var(--black);
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: 900;
+
+    text-shadow:
+        2px 2px 0 var(--black),
+        -1px -1px 0 var(--black);
+}
+
+#play-time span {
+    color: var(--yellow);
+}
+
+/* ==========================================
+   MELDUNGEN
+========================================== */
+
+#notification-container {
+    position: fixed;
+    z-index: 60;
+
+    top: 25%;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+
+    pointer-events: none;
+}
+
+.notification {
+    padding: 12px 20px;
+
+    background: #292929;
+
+    border: 3px solid var(--black);
+    border-radius: 10px;
+
+    box-shadow: 0 4px 0 var(--black);
+
+    font-size: 12px;
+    color: white;
+
+    animation: notification-pop 0.25s ease;
+}
+
+@keyframes notification-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ==========================================
+   LADEANZEIGE
+========================================== */
+
+#loading-screen {
+    position: fixed;
+    z-index: 1000;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #6ba94c;
+}
+
+.loading-box {
+    width: min(430px, calc(100% - 35px));
+
+    padding: 32px;
+
+    background: #292929;
+
+    border: 5px solid var(--black);
+    border-radius: 17px;
+
+    box-shadow: 0 8px 0 var(--black);
+
+    text-align: center;
+}
+
+.loading-box h1 {
+    font-size: 25px;
+    letter-spacing: 2px;
+    color: white;
+
+    text-shadow:
+        3px 3px 0 var(--black);
+}
+
+.loading-box p {
+    margin-top: 12px;
+
+    color: #cccccc;
+
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+.loading-bar {
+    width: 100%;
+    height: 17px;
+
+    margin-top: 27px;
+
+    background: #171717;
+
+    border: 3px solid var(--black);
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+#loading-progress {
+    width: 0%;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        #ffad36,
+        #ffe45c
+    );
+
+    transition: width 0.2s ease;
+}
+
+#loading-text {
+    margin-top: 12px;
+
+    color: #dddddd;
+    font-size: 10px;
+}
+
+/* ==========================================
+   SIEG
+========================================== */
+
+#victory-screen {
+    position: fixed;
+    z-index: 2000;
+
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(7px);
+}
+
+.victory-box {
+    width: min(480px, calc(100% - 30px));
+
+    padding: 35px;
+
+    background: #343434;
+
+    border: 5px solid var(--black);
+    border-radius: 17px;
+
+    box-shadow: 0 9px 0 var(--black);
+
+    text-align: center;
+
+    animation: victory-pop 0.4s ease;
+}
+
+@keyframes victory-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.victory-box h1 {
+    color: var(--yellow);
+
+    font-size: 25px;
+
+    text-shadow:
+        3px 3px 0 var(--black),
+        -2px -2px 0 var(--black);
+}
+
+.victory-box p {
+    margin-top: 13px;
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+.victory-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    margin: 25px 0;
+}
+
+.victory-stats div {
+    padding: 15px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    background: #242424;
+
+    border: 3px solid var(--black);
+    border-radius: 9px;
+}
+
+.victory-stats span {
+    font-size: 10px;
+    color: #cccccc;
+}
+
+.victory-stats strong {
+    color: var(--green);
+    font-size: 17px;
+}
+
+#restart-button {
+    width: 100%;
+
+    padding: 15px;
+
+    background: var(--yellow);
+
+    border: 4px solid var(--black);
+    border-radius: 10px;
+
+    box-shadow: 0 5px 0 var(--black);
+
+    color: var(--black);
+
+    font-size: 13px;
+    font-weight: 900;
+
+    transition: transform 0.15s ease;
+}
+
+#restart-button:hover {
+    transform: translateY(-3px);
+}
+
+#restart-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--black);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 600px) {
+
+    #money-display {
+        top: 12px;
+        left: 10px;
+        transform: scale(0.8) rotate(-2deg);
+        transform-origin: top left;
+    }
+
+    #bag-display {
+        top: 95px;
+        left: 8px;
+        transform: scale(0.8);
+        transform-origin: top left;
+    }
+
+    .hotbar-slot {
+        width: 65px;
+        height: 65px;
+    }
+
+    #play-time {
+        right: 8px;
+        bottom: 10px;
+        transform: scale(0.85);
+        transform-origin: bottom right;
+    }
+
+    #grab-prompt {
+        bottom: 110px;
+    }
+
+}
