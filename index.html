@@ -4,526 +4,878 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>FIND THE NEEDLE</title>
 
     <link rel="stylesheet" href="ui.css">
+
+    <style>
+        /* Zusätzliche Struktur- und Kompatibilitätsregeln */
+
+        #game-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        #game-ui {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #game-ui button,
+        #game-ui .interactive {
+            pointer-events: auto;
+        }
+
+        #bag-display,
+        #money-display,
+        #hotbar,
+        #play-time,
+        #grab-prompt,
+        #crosshair-container {
+            pointer-events: none;
+        }
+
+        #bag-count {
+            white-space: nowrap;
+        }
+
+        #sell-hint.visible,
+        #interaction-ui.visible {
+            display: flex;
+        }
+
+        #game-message {
+            position: fixed;
+            top: 18%;
+            left: 50%;
+            z-index: 80;
+            transform: translateX(-50%);
+            display: none;
+            padding: 12px 20px;
+            color: white;
+            background: #252525;
+            border: 3px solid #171717;
+            border-radius: 10px;
+            box-shadow: 0 4px 0 #171717;
+            font-size: 13px;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #game-message.visible {
+            display: block;
+        }
+
+        .control-info {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 20;
+            padding: 10px 14px;
+            background: rgba(25,25,25,0.85);
+            border: 3px solid #171717;
+            border-radius: 9px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.7;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .control-info {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- 3D WELT -->
-    <main id="game-container"></main>
+    <!-- =====================================
+         3D-SPIELWELT
+    ====================================== -->
 
-    <!-- LADEANZEIGE -->
-    <section id="loading-screen">
+    <div id="game-container"></div>
+
+
+    <!-- =====================================
+         SPIEL-INTERFACE
+    ====================================== -->
+
+    <div id="game-ui">
+
+        <!-- GELDANZEIGE -->
+
+        <div id="money-display">
+
+            <div class="money-bill-icon">
+                <div class="money-bill"></div>
+                <div class="money-bill"></div>
+                <div class="money-bill"></div>
+                <div class="money-band"></div>
+            </div>
+
+            <div class="money-label">
+                <div class="money-caption">DEIN GELD</div>
+                <div id="money">0,00 €</div>
+            </div>
+
+        </div>
+
+
+        <!-- HEUBEUTEL -->
+
+        <div id="bag-display">
+
+            <div class="bag-mouth"></div>
+
+            <div class="bag-body">
+                <div class="bag-hay" id="bag-hay"></div>
+            </div>
+
+            <div class="bag-count" id="bag-count">
+                0/25
+            </div>
+
+            <div class="bag-label">
+                HEU
+            </div>
+
+        </div>
+
+
+        <!-- FADENKREUZ -->
+
+        <div id="crosshair-container">
+            <img
+                id="crosshair"
+                src="fadenkreuz.png"
+                alt="Fadenkreuz"
+                draggable="false"
+            >
+        </div>
+
+
+        <!-- GREIFEN-HINWEIS -->
+
+        <div id="grab-prompt">
+
+            <div class="mouse-icon"></div>
+
+            <div class="grab-text">
+                GREIFEN
+            </div>
+
+        </div>
+
+
+        <!-- INVENTAR MIT GENAU ZWEI PLÄTZEN -->
+
+        <div id="hotbar">
+
+            <!-- SLOT 1: HAND -->
+
+            <div
+                class="hotbar-slot selected"
+                id="slot-hand"
+                title="Hand"
+            >
+
+                <div class="hand-icon">
+
+                    <!-- Hintere Hand -->
+
+                    <svg
+                        class="hand-back"
+                        viewBox="0 0 64 64"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path d="
+                            M19 55
+                            L14 36
+                            C13 32 15 29 18 29
+                            C20 29 22 31 23 34
+                            L21 16
+                            C21 12 23 10 26 10
+                            C29 10 31 12 31 16
+                            L33 29
+                            L33 9
+                            C33 5 35 3 38 3
+                            C41 3 43 5 43 9
+                            L44 29
+                            L46 14
+                            C47 10 49 9 52 10
+                            C55 11 56 14 55 18
+                            L52 39
+                            C51 47 46 54 39 57
+                            Z
+                        "/>
+                    </svg>
+
+
+                    <!-- Vordere Hand -->
+
+                    <svg
+                        class="hand-front"
+                        viewBox="0 0 64 64"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path d="
+                            M19 55
+                            L14 36
+                            C13 32 15 29 18 29
+                            C20 29 22 31 23 34
+                            L21 16
+                            C21 12 23 10 26 10
+                            C29 10 31 12 31 16
+                            L33 29
+                            L33 9
+                            C33 5 35 3 38 3
+                            C41 3 43 5 43 9
+                            L44 29
+                            L46 14
+                            C47 10 49 9 52 10
+                            C55 11 56 14 55 18
+                            L52 39
+                            C51 47 46 54 39 57
+                            Z
+                        "/>
+                    </svg>
+
+                </div>
+
+                <div class="slot-label">
+                    HAND
+                </div>
+
+            </div>
+
+
+            <!-- SLOT 2: LEER -->
+
+            <div
+                class="hotbar-slot"
+                id="slot-empty"
+                title="Leer"
+            >
+
+                <div class="slot-label">
+                    LEER
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SPIELZEIT -->
+
+        <div id="play-time">
+            ZEIT:
+            <span id="elapsed-time">00:00</span>
+        </div>
+
+
+        <!-- VERKAUF-HINWEIS -->
+
+        <div id="sell-hint">
+
+            <strong> E </strong>
+
+            <span>
+                HEU VERKAUFEN
+            </span>
+
+        </div>
+
+
+        <!-- INTERAKTIONSANZEIGE -->
+
+        <div id="interaction-ui">
+
+            <div id="interaction-title">
+                INTERAKTION
+            </div>
+
+            <div id="interaction-description">
+                Drücke E
+            </div>
+
+        </div>
+
+
+        <!-- KONTROLLEN -->
+
+        <div class="control-info">
+            WASD – Bewegen<br>
+            MAUS – Umschauen<br>
+            SHIFT – Rennen<br>
+            LINKSKLICK – Heu sammeln<br>
+            E – Heu verkaufen
+        </div>
+
+
+        <!-- NACHRICHTEN -->
+
+        <div id="notification-container"></div>
+
+        <div id="game-message"></div>
+
+    </div>
+
+
+    <!-- =====================================
+         LADEBILDSCHIRM
+    ====================================== -->
+
+    <div id="loading-screen">
+
         <div class="loading-box">
+
             <h1>FIND THE NEEDLE</h1>
-            <p>Ein Heuhaufen. Eine Nadel.</p>
+
+            <p>
+                Eine Nadel im Heuhaufen.
+                100.000 Halme. Findest du sie?
+            </p>
 
             <div class="loading-bar">
                 <div id="loading-progress"></div>
             </div>
 
-            <div id="loading-text">Lade Spielwelt ...</div>
-        </div>
-    </section>
-
-    <!-- KOPFLEISTE -->
-    <header id="top-ui">
-
-        <div class="game-logo">
-            <div class="logo-title">FIND THE NEEDLE</div>
-            <div class="logo-subtitle">THE HAYSTACK CHALLENGE</div>
-        </div>
-
-        <div class="top-stats">
-
-            <div class="stat-card">
-                <div class="stat-label">GUTHABEN</div>
-                <div class="stat-value" id="money">0,00 €</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-label">VERKAUFT</div>
-                <div class="stat-value" id="sold-count">0</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-label">IM BEUTEL</div>
-                <div class="stat-value" id="bag-count">0 / 25</div>
+            <div id="loading-text">
+                Spiel wird vorbereitet ...
             </div>
 
         </div>
 
-    </header>
-
-    <!-- LINKE SEITE -->
-    <aside id="left-ui">
-
-        <section class="panel inventory-panel">
-
-            <div class="panel-heading">INVENTAR</div>
-
-            <div class="inventory-capacity">
-                <span>Kapazität</span>
-                <strong id="inventory-capacity">0 / 25</strong>
-            </div>
-
-            <div class="inventory-progress">
-                <div id="inventory-progress-fill"></div>
-            </div>
-
-            <div id="inventory-grid" class="inventory-grid"></div>
-
-            <div class="inventory-footer">
-                <span>Wert des Inhalts</span>
-                <strong id="bag-value">0,00 €</strong>
-            </div>
-
-        </section>
-
-        <section class="panel task-panel">
-
-            <div class="panel-heading">DEINE AUFGABE</div>
-
-            <h2>Finde die Nadel!</h2>
-
-            <p>
-                Durchsuche den riesigen Heuhaufen.
-                Sammle einzelne Halme und verkaufe sie.
-                Irgendwo im Heu befindet sich eine Nadel.
-            </p>
-
-            <div class="task-reward">
-                <span>GEWINNBEDINGUNG</span>
-                <strong>FINDE DIE NADEL</strong>
-            </div>
-
-        </section>
-
-    </aside>
-
-    <!-- RECHTE SEITE -->
-    <aside id="right-ui">
-
-        <section class="panel shop-panel">
-
-            <div class="panel-heading">VERKAUFSÜBERSICHT</div>
-
-            <div class="shop-item">
-                <div class="shop-item-info">
-                    <strong>Heuhalm</strong>
-                    <small>Einzelner Heuhalm</small>
-                </div>
-
-                <div class="shop-item-price">0,01 €</div>
-            </div>
-
-            <div class="shop-separator"></div>
-
-            <div class="shop-total">
-                <span>Verdient insgesamt</span>
-                <strong id="total-earned">0,00 €</strong>
-            </div>
-
-            <div class="shop-total">
-                <span>Verkaufte Halme</span>
-                <strong id="total-sold">0</strong>
-            </div>
-
-        </section>
-
-        <section class="panel controls-panel">
-
-            <div class="panel-heading">STEUERUNG</div>
-
-            <div class="control-row">
-                <span class="key">W A S D</span>
-                <span>Bewegen</span>
-            </div>
-
-            <div class="control-row">
-                <span class="key">MAUS</span>
-                <span>Umschauen</span>
-            </div>
-
-            <div class="control-row">
-                <span class="key">SHIFT</span>
-                <span>Sprinten</span>
-            </div>
-
-            <div class="control-row">
-                <span class="key">LINKSKLICK</span>
-                <span>Halm sammeln</span>
-            </div>
-
-            <div class="control-row">
-                <span class="key">E</span>
-                <span>Verkaufen</span>
-            </div>
-
-        </section>
-
-    </aside>
-
-    <!-- FADENKREUZ -->
-    <div id="crosshair-container">
-        <img
-            id="crosshair"
-            src="fadenkreuz.png"
-            alt="Fadenkreuz"
-        >
     </div>
 
-    <!-- INTERAKTION -->
-    <div id="interaction-ui">
-        <div id="interaction-title"></div>
-        <div id="interaction-description"></div>
-    </div>
 
-    <!-- VERKAUFSHINWEIS -->
-    <div id="sell-hint">
-        <span class="key">E</span>
-        <span>Heu verkaufen</span>
-    </div>
+    <!-- =====================================
+         SIEG-BILDSCHIRM
+    ====================================== -->
 
-    <!-- MELDUNGEN -->
-    <div id="notification-container"></div>
-
-    <!-- UNTERE LEISTE -->
-    <footer id="bottom-ui">
-
-        <div class="bottom-left">
-            <span class="status-dot"></span>
-            <span>SPIELWELT AKTIV</span>
-        </div>
-
-        <div class="bottom-center">
-            FIND THE NEEDLE
-            <span>VERSION 1.0</span>
-        </div>
-
-        <div class="bottom-right">
-            <span>100.000 HEUHALME</span>
-        </div>
-
-    </footer>
-
-    <!-- SIEG -->
-    <section id="victory-screen">
+    <div id="victory-screen">
 
         <div class="victory-box">
 
-            <h1>DU HAST SIE GEFUNDEN!</h1>
+            <h1>DU HAST DIE NADEL GEFUNDEN!</h1>
 
             <p>
-                Du hast die versteckte Nadel entdeckt.
+                Du hast es tatsächlich geschafft.
             </p>
 
             <div class="victory-stats">
 
                 <div>
-                    <span>Verkaufte Halme</span>
-                    <strong id="victory-sold">0</strong>
+                    <span>GESPIELTE ZEIT</span>
+                    <strong id="victory-time">00:00</strong>
                 </div>
 
                 <div>
-                    <span>Verdientes Geld</span>
+                    <span>VERDIENTES GELD</span>
                     <strong id="victory-money">0,00 €</strong>
                 </div>
 
             </div>
 
             <button id="restart-button">
-                NOCHMAL SPIELEN
+                NOCH EINMAL SPIELEN
             </button>
 
         </div>
 
-    </section>
+    </div>
 
-    <!-- THREE.JS -->
+
+    <!-- =====================================
+         THREE.JS
+    ====================================== -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 
-    <!-- SPIELSYSTEME -->
+
+    <!-- =====================================
+         SPIELMODULE
+    ====================================== -->
+
     <script src="welt.js"></script>
     <script src="heu.js"></script>
     <script src="verkauf.js"></script>
 
-    <!-- HAUPTSTEUERUNG -->
+
+    <!-- =====================================
+         ZENTRALE SPIELSTEUERUNG
+    ====================================== -->
+
     <script>
-    (() => {
 
-        "use strict";
+    "use strict";
 
-        const CONFIG = {
-            hayCount: 100000,
-            bagCapacity: 25,
-            hayPrice: 0.01
-        };
 
-        const GAME = {
-            money: 0,
-            sold: 0,
-            bag: [],
-            won: false,
-            running: true
-        };
+    /* -------------------------------------
+       SPIELDATEN
+    ------------------------------------- */
 
-        const $ = id => document.getElementById(id);
+    const GAME = {
 
-        // ==================================
-        // INVENTAR
-        // ==================================
+        money: 0,
 
-        function createInventory() {
+        hay: 0,
 
-            const grid = $("inventory-grid");
+        maxHay: 25,
 
-            grid.innerHTML = "";
+        hayValue: 0.01,
 
-            for (let i = 0; i < CONFIG.bagCapacity; i++) {
+        elapsedSeconds: 0,
 
-                const slot = document.createElement("div");
+        started: false,
 
-                slot.className = "inventory-slot";
-                slot.id = "slot-" + i;
+        won: false,
 
-                slot.innerHTML = `
-                    <span class="slot-number">${i + 1}</span>
-                    <span class="slot-icon"></span>
-                `;
+        loading: false
 
-                grid.appendChild(slot);
-            }
+    };
+
+
+    const CONFIG = {
+
+        maxHay: 25,
+
+        hayValue: 0.01,
+
+        totalHay: 100000
+
+    };
+
+
+    /* -------------------------------------
+       HTML-ELEMENTE
+    ------------------------------------- */
+
+    const UI = {
+
+        money: document.getElementById("money"),
+
+        bag: document.getElementById("bag-display"),
+
+        bagHay: document.getElementById("bag-hay"),
+
+        bagCount: document.getElementById("bag-count"),
+
+        elapsed: document.getElementById("elapsed-time"),
+
+        loading: document.getElementById("loading-screen"),
+
+        loadingProgress: document.getElementById("loading-progress"),
+
+        loadingText: document.getElementById("loading-text"),
+
+        victory: document.getElementById("victory-screen"),
+
+        victoryTime: document.getElementById("victory-time"),
+
+        victoryMoney: document.getElementById("victory-money"),
+
+        notification: document.getElementById("notification-container"),
+
+        message: document.getElementById("game-message"),
+
+        sellHint: document.getElementById("sell-hint")
+
+    };
+
+
+    /* -------------------------------------
+       GELD FORMATIEREN
+    ------------------------------------- */
+
+    function formatMoney(value) {
+
+        return value.toFixed(2).replace(".", ",") + " €";
+
+    }
+
+
+    /* -------------------------------------
+       SPIELZEIT FORMATIEREN
+    ------------------------------------- */
+
+    function formatTime(seconds) {
+
+        const minutes = Math.floor(seconds / 60);
+
+        const remainingSeconds = seconds % 60;
+
+        return String(minutes).padStart(2, "0")
+            + ":"
+            + String(remainingSeconds).padStart(2, "0");
+
+    }
+
+
+    /* -------------------------------------
+       INTERFACE AKTUALISIEREN
+    ------------------------------------- */
+
+    function updateUI() {
+
+        UI.money.textContent = formatMoney(GAME.money);
+
+        UI.bagCount.textContent =
+            GAME.hay + "/" + GAME.maxHay;
+
+        UI.elapsed.textContent =
+            formatTime(GAME.elapsedSeconds);
+
+        const fillPercentage =
+            (GAME.hay / GAME.maxHay) * 100;
+
+        UI.bagHay.style.height =
+            fillPercentage + "%";
+
+    }
+
+
+    /* -------------------------------------
+       HEU SAMMELN
+    ------------------------------------- */
+
+    function onHayCollected(amount = 1) {
+
+        if (GAME.won) return false;
+
+        if (GAME.hay >= GAME.maxHay) {
+
+            showNotification("Dein Beutel ist voll!");
+
+            return false;
+
         }
 
-        function updateInventory() {
+        GAME.hay = Math.min(
+            GAME.maxHay,
+            GAME.hay + amount
+        );
 
-            const count = GAME.bag.length;
+        updateUI();
 
-            $("bag-count").textContent =
-                `${count} / ${CONFIG.bagCapacity}`;
+        UI.bag.classList.remove("collecting");
 
-            $("inventory-capacity").textContent =
-                `${count} / ${CONFIG.bagCapacity}`;
+        void UI.bag.offsetWidth;
 
-            $("bag-value").textContent =
-                formatMoney(count * CONFIG.hayPrice);
+        UI.bag.classList.add("collecting");
 
-            $("inventory-progress-fill").style.width =
-                (count / CONFIG.bagCapacity * 100) + "%";
+        return true;
 
-            for (let i = 0; i < CONFIG.bagCapacity; i++) {
+    }
 
-                const slot = $("slot-" + i);
 
-                slot.classList.toggle(
-                    "occupied",
-                    i < count
-                );
+    /* -------------------------------------
+       HEU VERKAUFEN
+    ------------------------------------- */
 
-                slot.querySelector(".slot-icon").textContent =
-                    i < count ? "H" : "";
-            }
-        }
+    function onHaySold(amount = GAME.hay) {
 
-        // ==================================
-        // GELD
-        // ==================================
+        if (amount <= 0) return;
 
-        function formatMoney(value) {
+        const actualAmount = Math.min(
+            amount,
+            GAME.hay
+        );
 
-            return value.toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR"
-            });
-        }
+        GAME.hay -= actualAmount;
 
-        function updateMoney() {
+        GAME.money += actualAmount * CONFIG.hayValue;
 
-            $("money").textContent =
-                formatMoney(GAME.money);
+        GAME.money = Math.round(GAME.money * 100) / 100;
 
-            $("total-earned").textContent =
-                formatMoney(GAME.money);
+        updateUI();
 
-            $("sold-count").textContent =
-                GAME.sold;
+        showNotification(
+            actualAmount + " Halme verkauft! +" +
+            formatMoney(actualAmount * CONFIG.hayValue)
+        );
 
-            $("total-sold").textContent =
-                GAME.sold;
-        }
+    }
 
-        // ==================================
-        // HEU SAMMELN
-        // ==================================
 
-        function collectHay() {
+    /* -------------------------------------
+       BENACHRICHTIGUNGEN
+    ------------------------------------- */
 
-            if (GAME.won || GAME.bag.length >= CONFIG.bagCapacity) {
+    function showNotification(message) {
 
-                if (GAME.bag.length >= CONFIG.bagCapacity) {
-                    showNotification("Dein Beutel ist voll.");
-                }
+        const notification = document.createElement("div");
 
-                return;
-            }
+        notification.className = "notification";
 
-            if (typeof collectTargetHay !== "function") return;
+        notification.textContent = message;
 
-            const result = collectTargetHay();
+        UI.notification.appendChild(notification);
 
-            if (!result) return;
+        setTimeout(() => {
 
-            GAME.bag.push(result);
+            notification.remove();
 
-            updateInventory();
+        }, 2500);
 
-            showNotification("1 Heuhalm gesammelt.");
-        }
+    }
 
-        // ==================================
-        // VERKAUF
-        // ==================================
 
-        function sellHay() {
+    /* -------------------------------------
+       ZENTRALE MELDUNG
+    ------------------------------------- */
 
-            if (GAME.won) return;
+    function showMessage(message, duration = 2000) {
 
-            if (typeof trySellHay === "function") {
+        UI.message.textContent = message;
 
-                trySellHay(GAME);
+        UI.message.classList.add("visible");
 
-                updateInventory();
-                updateMoney();
-            }
-        }
+        setTimeout(() => {
 
-        // ==================================
-        // MELDUNGEN
-        // ==================================
+            UI.message.classList.remove("visible");
 
-        function showNotification(message) {
+        }, duration);
 
-            const container = $("notification-container");
+    }
 
-            const item = document.createElement("div");
 
-            item.className = "notification";
-            item.textContent = message;
+    /* -------------------------------------
+       SPIELZEIT
+    ------------------------------------- */
 
-            container.appendChild(item);
+    setInterval(() => {
 
-            setTimeout(() => {
-                item.remove();
-            }, 2400);
-        }
+        if (!GAME.started || GAME.won) return;
 
-        // ==================================
-        // LADEANZEIGE
-        // ==================================
+        GAME.elapsedSeconds++;
 
-        function setLoadingProgress(progress, message) {
+        UI.elapsed.textContent =
+            formatTime(GAME.elapsedSeconds);
 
-            $("loading-progress").style.width =
-                progress + "%";
+    }, 1000);
 
-            $("loading-text").textContent =
-                message || "Lade Spielwelt ...";
-        }
 
-        function finishLoading() {
+    /* -------------------------------------
+       VERKAUF MIT E
+    ------------------------------------- */
 
-            $("loading-screen").style.display = "none";
-        }
+    document.addEventListener("keydown", (event) => {
 
-        // ==================================
-        // SIEG
-        // ==================================
+        if (event.code !== "KeyE") return;
 
-        function winGame() {
+        if (!GAME.started || GAME.won) return;
 
-            if (GAME.won) return;
+        if (typeof trySellHay === "function") {
 
-            GAME.won = true;
-
-            document.exitPointerLock?.();
-
-            $("victory-sold").textContent =
-                GAME.sold;
-
-            $("victory-money").textContent =
-                formatMoney(GAME.money);
-
-            $("victory-screen").style.display = "flex";
-        }
-
-        // ==================================
-        // SPIEL NEUSTARTEN
-        // ==================================
-
-        $("restart-button").addEventListener("click", () => {
-            location.reload();
-        });
-
-        // ==================================
-        // MAUS UND TASTATUR
-        // ==================================
-
-        document.addEventListener("mousedown", event => {
-
-            if (
-                event.button === 0 &&
-                document.pointerLockElement &&
-                !GAME.won
-            ) {
-                collectHay();
-            }
-        });
-
-        document.addEventListener("keydown", event => {
-
-            if (event.code === "KeyE" && !event.repeat) {
-                sellHay();
-            }
-        });
-
-        // ==================================
-        // GLOBALE SCHNITTSTELLE
-        // ==================================
-
-        window.GAME = GAME;
-        window.CONFIG = CONFIG;
-
-        window.showNotification = showNotification;
-        window.updateInventory = updateInventory;
-        window.updateMoney = updateMoney;
-        window.setLoadingProgress = setLoadingProgress;
-        window.finishLoading = finishLoading;
-        window.winGame = winGame;
-
-        // ==================================
-        // START
-        // ==================================
-
-        createInventory();
-
-        updateInventory();
-        updateMoney();
-
-        if (typeof initWorld === "function") {
-
-            initWorld();
+            trySellHay(GAME);
 
         } else {
 
-            console.error("welt.js: initWorld() fehlt.");
-            $("loading-text").textContent =
-                "Fehler: welt.js konnte nicht geladen werden.";
+            if (GAME.hay > 0) {
+
+                onHaySold(GAME.hay);
+
+            }
+
         }
 
-    })();
+    });
+
+
+    /* -------------------------------------
+       VOLLEN BEUTEL MELDEN
+    ------------------------------------- */
+
+    function checkBagFull() {
+
+        if (GAME.hay >= GAME.maxHay) {
+
+            UI.sellHint.classList.add("visible");
+
+        } else {
+
+            UI.sellHint.classList.remove("visible");
+
+        }
+
+    }
+
+
+    /* -------------------------------------
+       SPIEL GEWONNEN
+    ------------------------------------- */
+
+    function winGame() {
+
+        if (GAME.won) return;
+
+        GAME.won = true;
+
+        UI.victoryTime.textContent =
+            formatTime(GAME.elapsedSeconds);
+
+        UI.victoryMoney.textContent =
+            formatMoney(GAME.money);
+
+        UI.victory.style.display = "flex";
+
+        document.exitPointerLock?.();
+
+    }
+
+
+    /* -------------------------------------
+       NEUSTART
+    ------------------------------------- */
+
+    document.getElementById("restart-button")
+        .addEventListener("click", () => {
+
+            location.reload();
+
+        });
+
+
+    /* -------------------------------------
+       LADEFORTSCHRITT
+    ------------------------------------- */
+
+    function setLoadingProgress(progress, message) {
+
+        const safeProgress = Math.max(
+            0,
+            Math.min(100, progress)
+        );
+
+        UI.loadingProgress.style.width =
+            safeProgress + "%";
+
+        if (message) {
+
+            UI.loadingText.textContent = message;
+
+        }
+
+    }
+
+
+    /* -------------------------------------
+       SPIEL STARTEN
+    ------------------------------------- */
+
+    async function startGame() {
+
+        try {
+
+            setLoadingProgress(5, "Three.js wird geladen ...");
+
+            if (typeof THREE === "undefined") {
+
+                throw new Error("Three.js konnte nicht geladen werden.");
+
+            }
+
+            setLoadingProgress(15, "Spielwelt wird erstellt ...");
+
+            if (typeof initWorld === "function") {
+
+                await initWorld();
+
+            } else {
+
+                throw new Error("initWorld() fehlt in welt.js.");
+
+            }
+
+            setLoadingProgress(55, "Heuhaufen wird vorbereitet ...");
+
+            if (typeof initHay === "function") {
+
+                await initHay();
+
+            }
+
+            setLoadingProgress(80, "Verkaufstisch wird vorbereitet ...");
+
+            if (typeof initSaleTable === "function") {
+
+                await initSaleTable();
+
+            }
+
+            setLoadingProgress(100, "Fertig!");
+
+            updateUI();
+
+            GAME.started = true;
+
+            setTimeout(() => {
+
+                UI.loading.style.display = "none";
+
+            }, 350);
+
+        } catch (error) {
+
+            console.error("Spiel konnte nicht gestartet werden:", error);
+
+            UI.loadingText.textContent =
+                "Fehler: " + error.message;
+
+        }
+
+    }
+
+
+    /* -------------------------------------
+       GLOBALE SPIELFUNKTIONEN
+       Für welt.js, heu.js und verkauf.js
+    ------------------------------------- */
+
+    window.GAME = GAME;
+
+    window.CONFIG = CONFIG;
+
+    window.updateUI = updateUI;
+
+    window.onHayCollected = onHayCollected;
+
+    window.onHaySold = onHaySold;
+
+    window.showNotification = showNotification;
+
+    window.showMessage = showMessage;
+
+    window.winGame = winGame;
+
+    window.setLoadingProgress = setLoadingProgress;
+
+    window.checkBagFull = checkBagFull;
+
+
+    /* -------------------------------------
+       INTERFACE-UPDATE
+    ------------------------------------- */
+
+    setInterval(checkBagFull, 150);
+
+
+    /* -------------------------------------
+       START
+    ------------------------------------- */
+
+    updateUI();
+
+    startGame();
+
     </script>
 
 </body>
